@@ -1,0 +1,6 @@
+@TMDT_HostAddress = http://localhost:5209
+
+GET {{TMDT_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

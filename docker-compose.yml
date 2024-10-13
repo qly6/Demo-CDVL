@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # SQL Server
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+    ports:
+      - "1435:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+    networks:
+      - backend
+
+  # .NET Web API
+  webapi:
+    build:
+      context: ./WebAPI/TMDT/TMDT # Path to your WebAPI project
+      dockerfile: Dockerfile
+    container_name: webapi
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=YourDatabase;User=sa;Password=YourStrong!Passw0rd;
+    ports:
+      - "5000:80"
+    depends_on:
+      - sqlserver
+    networks:
+      - backend
+
+  # Angular Frontend
+  # angular:
+  #   build:
+  #     context: ./AngularApp # Path to your Angular app
+  #     dockerfile: Dockerfile
+  #   container_name: angular
+  #   ports:
+  #     - "4200:80"
+  #   depends_on:
+  #     - webapi
+  #   networks:
+  #     - backend
+
+volumes:
+  sqlserverdata:
+  
+networks:
+  backend:
+    driver: bridge
